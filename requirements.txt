@@ -4,6 +4,7 @@ Django==1.11.5
 docutils==0.14
 gunicorn==19.7.1
 jmespath==0.9.3
+psycopg2==2.7.3.1
 python-dateutil==2.6.1
 pytz==2017.2
 s3transfer==0.1.11
