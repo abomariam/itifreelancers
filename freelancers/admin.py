@@ -72,3 +72,7 @@ admin.site.register(Intake, IntakeAdmin)
 admin.site.register(City, CityAdmin)
 admin.site.register(Country, CountryAdmin)
 
+
+admin.site.site_title = 'ITI Freelancers'
+admin.site.site_header = 'ITI Freelancers'
+

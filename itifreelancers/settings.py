@@ -120,3 +120,6 @@ try:
     from .local_settings import *
 except ImportError:
     pass
+
+
+SECURE_SSL_REDIRECT = not DEBUG
