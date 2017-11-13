@@ -1,0 +1,251 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>
+    <style>
+        thead th, tfoot td, tr th {
+            border: solid 1px #000000;
+            border-top: solid 1px #000000;
+        }
+
+        td, th {
+            border-left: solid 1px #000000;
+            border-right: solid 1px #000000;
+        }
+
+        .border-bottom {
+            border-bottom: solid 1px #000000;
+        }
+
+        .border-top {
+            border-top: solid 1px #000000;
+        }
+
+        .no-border {
+            border-left: none;
+            border-right: none;
+
+        }
+
+        .object-tools {
+            margin-top: -30px;
+        }
+
+        .object-tools button {
+            display: block;
+            float: left;
+            padding: 3px 12px;
+            background: #999;
+            font-weight: 400;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+            border-radius: 15px;
+            box-shadow: none;
+            appearance: none;
+            outline: none;
+            border: none;
+            line-height: 20px;
+        }
+
+        .object-tools button:hover {
+            cursor: pointer;
+            cursor: hand;
+        }
+
+        .object-tools {
+            margin-bottom: 20px;
+        }
+
+        a.button{
+            padding: 10px 15px;
+            margin: 5px;
+        }
+        a.button.active {
+            background-color: #000000;
+        }
+        .submit-row{
+            padding: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <p><strong>FREELANCERS STATS</strong></p>
+    <p>These are statistics of freelancers on the program</p>
+    <div id="changelist">
+        <div class="results">
+            <table id="result_list" style="width: 25%">
+                <tr>
+                    <th class="border-bottom border-top">TOTAL FREELANCERS</th>
+                    <td class="border-bottom border-top">{{ total_freelancers }}</td>
+                </tr>
+                <tr>
+                    <th class="border-bottom border-top">ACTIVE FREELANCERS</th>
+                    <td class="border-bottom border-top">{{ active_freelancers }}</td>
+                </tr>
+                <tr>
+                    <th class="border-bottom border-top">WORKING FREELANCERS</th>
+                    <td class="border-bottom border-top">{{ working_freelancers }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br/>
+    <hr/>
+
+    <p><strong>JOBS STATS</strong></p>
+    <p>These are the statistics for jobs.</p>
+    <div id="changelist">
+        <div class="results">
+            <table id="result_list" style="width: 25%">
+                <tr>
+                    <th class="border-bottom border-top">JOBS APPLIED FOR</th>
+                    <td class="border-bottom border-top">{{ total_jobs }}</td>
+                </tr>
+                <tr>
+                    <th class="border-bottom border-top">JOBS INTERVIEWED</th>
+                    <td class="border-bottom border-top">{{ interviews_jobs }}</td>
+                </tr>
+                <tr>
+                    <th class="border-bottom border-top">JOBS HIRED</th>
+                    <td class="border-bottom border-top">{{ hired_jobs }}</td>
+                </tr>
+                <tr>
+                    <th class="border-bottom border-top">JOBS COMPLETED</th>
+                    <td class="border-bottom border-top">{{ completed_jobs }}</td>
+                </tr>
+                <tr>
+                    <th class="border-bottom border-top">JOBS DISPUTED</th>
+                    <td class="border-bottom border-top">{{ disputed_jobs }}</td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+    <br/>
+    <hr/>
+
+
+
+    <p><strong>Top Active Freelancers</strong></p>
+    <p>These are the top active freelancers ordered by the number of applications</p>
+    <div id="changelist">
+        <div class="results">
+            <table id="result_list" style="width: 25%">
+                <tr>
+                    <th class="border-bottom border-top">#</th>
+                    <th class="border-bottom border-top">Freelancer</th>
+                    <th class="border-bottom border-top">Applications</th>
+                </tr>
+                {% for freelancer in top_active_freelancers %}
+                <tr>
+                    <th class="border-bottom border-top">{{ forloop.counter }}</th>
+                    <th class="border-bottom border-top"><a href="{% url 'admin:freelancers_freelancer_change' freelancer.pk %}" target="_blank">{{ freelancer.name }}</a></th>
+                    <td class="border-bottom border-top">{{ freelancer.profiles__jobs__count }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <br/>
+    <hr/>
+
+    <p><strong>Top Working Freelancers By Jobs</strong></p>
+    <p>These are the top working freelancers ordered by the number of jobs</p>
+    <div id="changelist">
+        <div class="results">
+            <table id="result_list" style="width: 25%">
+                <tr>
+                    <th class="border-bottom border-top">#</th>
+                    <th class="border-bottom border-top">Freelancer</th>
+                    <th class="border-bottom border-top">jobs</th>
+                </tr>
+                {% for freelancer in top_working_freelancers %}
+                <tr>
+                    <th class="border-bottom border-top">{{ forloop.counter }}</th>
+                    <th class="border-bottom border-top"><a href="{% url 'admin:freelancers_freelancer_change' freelancer.pk %}" target="_blank">{{ freelancer.name }}</a></th>
+                    <td class="border-bottom border-top">{{ freelancer.jobs_count }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <br/>
+    <hr/>
+
+
+    <p><strong>Top Working Freelancers By Income</strong></p>
+    <p>These are the top working freelancers ordered by income</p>
+    <div id="changelist">
+        <div class="results">
+            <table id="result_list" style="width: 25%">
+                <tr>
+                    <th class="border-bottom border-top">#</th>
+                    <th class="border-bottom border-top">Freelancer</th>
+                    <th class="border-bottom border-top">Income</th>
+                </tr>
+                {% for freelancer in top_working_freelancers_by_income %}
+                <tr>
+                    <th class="border-bottom border-top">{{ forloop.counter }}</th>
+                    <th class="border-bottom border-top"><a href="{% url 'admin:freelancers_freelancer_change' freelancer.pk %}" target="_blank">{{ freelancer.name }}</a></th>
+                    <td class="border-bottom border-top">{{ freelancer.income }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <br/>
+    <hr/>
+
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <p><strong>Total stats</strong></p>
+    <div id="chart_div"></div>
+
+    <script>
+    google.charts.load('current', {packages: ['corechart', 'line']});
+google.charts.setOnLoadCallback(drawCrosshairs);
+
+function drawCrosshairs() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('date', 'Month');
+      data.addColumn('number', 'Staff');
+      data.addColumn('number', 'Venue');
+      data.addColumn('number', 'Jobs');
+
+      data.addRows([
+        {% for item in chart_data %}
+            [new Date({{ item.year }}, {{ item.month }}),  {{ item.staff }},  {{ item.venues }}, {{ item.jobs }}]{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ]);
+
+      var options = {
+        hAxis: {
+          title: 'Month'
+        },
+        vAxis: {
+          title: 'Count'
+        },
+          title: 'Number of Staff, Venues and Jobs in the site',
+          width: 900,
+        height: 500
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+
+      var formatter = new google.visualization.DateFormat({pattern: 'MMM y'});
+      formatter.format(data, 0);
+      chart.draw(data, options);
+{#      chart.setSelection([{row: 38, column: 1}]);#}
+
+    }
+    </script>
+{% endblock %}
