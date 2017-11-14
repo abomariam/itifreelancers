@@ -15,16 +15,23 @@ def simple_stats(request, *args, **kwargs):
     context['total_freelancers'] = Freelancer.objects.count()
     context['active_freelancers'] = Freelancer.objects.annotate(Count('profiles__jobs'))\
         .filter(profiles__jobs__count__gt=0).count()
+    context['inactive_freelancers'] = context['total_freelancers'] - context['active_freelancers']
     context['working_freelancers'] = Freelancer.objects.annotate(
         jobs_count=Case(
             When(profiles__jobs__is_hired=True, then=Count('profiles__jobs'))
         )).filter(jobs_count__gt=0).count()
+    context['not_working_freelancers'] = context['total_freelancers'] - context['working_freelancers']
+
 
     context['total_jobs'] = Job.objects.count()
     context['interviews_jobs'] = Job.objects.filter(is_interviewed=True).count()
+    context['interviews_jobs_percent'] = (context['interviews_jobs'] / context['total_jobs']) * 100
     context['hired_jobs'] = Job.objects.filter(is_hired=True).count()
+    context['hired_jobs_percent'] = (context['hired_jobs'] / context['total_jobs']) * 100
     context['completed_jobs'] = Job.objects.filter(is_completed_successfully=True).count()
+    context['completed_jobs_percent'] = (context['completed_jobs'] / context['total_jobs']) * 100
     context['disputed_jobs'] = Job.objects.filter(is_disputed=True).count()
+    context['disputed_jobs_percent'] = (context['disputed_jobs'] / context['total_jobs']) * 100
 
     context['top_active_freelancers'] = Freelancer.objects.annotate(Count('profiles__jobs')) \
         .filter(profiles__jobs__count__gt=0)\
@@ -39,6 +46,8 @@ def simple_stats(request, *args, **kwargs):
         income=Case(
             When(profiles__jobs__total_job_income__gt=0, then=Sum('profiles__jobs__total_job_income')), default=0
         )).filter(income__gt=0).order_by('-income')[0:10]
+
+    context['income'] = Job.objects.aggregate(Sum('total_job_income'))['total_job_income__sum']
 
     context.update({
         'has_permission': True,

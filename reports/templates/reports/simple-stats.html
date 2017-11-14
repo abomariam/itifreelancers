@@ -75,12 +75,20 @@
 {% endblock %}
 
 {% block content %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+        <p><strong>Income</strong></p>
+    <p>Total Income: <strong>${{ income }}</strong></p>
+    <br/>
+    <hr/>
+
+
+    <div style="display: inline-block; width: 25%; vertical-align: top">
     <p><strong>FREELANCERS STATS</strong></p>
     <p>These are statistics of freelancers on the program</p>
-    <div id="changelist">
+    <div id="changelist" >
         <div class="results">
-            <table id="result_list" style="width: 25%">
+            <table id="result_list">
                 <tr>
                     <th class="border-bottom border-top">TOTAL FREELANCERS</th>
                     <td class="border-bottom border-top">{{ total_freelancers }}</td>
@@ -96,14 +104,19 @@
             </table>
         </div>
     </div>
+    </div>
+    <div id="active_freelancers_chart_div" style="display: inline-block;"></div>
+    <div id="working_freelancers_chart_div" style="display: inline-block;"></div>
+
     <br/>
     <hr/>
 
+    <div style="display: inline-block; width: 25%; vertical-align: top">
     <p><strong>JOBS STATS</strong></p>
     <p>These are the statistics for jobs.</p>
-    <div id="changelist">
+    <div id="changelist" >
         <div class="results">
-            <table id="result_list" style="width: 25%">
+            <table id="result_list">
                 <tr>
                     <th class="border-bottom border-top">JOBS APPLIED FOR</th>
                     <td class="border-bottom border-top">{{ total_jobs }}</td>
@@ -128,6 +141,8 @@
             </table>
         </div>
     </div>
+    </div>
+    <div id="jobs_chart_div" style="display: inline-block;"></div>
     <br/>
     <hr/>
 
@@ -205,47 +220,98 @@
 
 
 
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <p><strong>Total stats</strong></p>
-    <div id="chart_div"></div>
 
-    <script>
-    google.charts.load('current', {packages: ['corechart', 'line']});
-google.charts.setOnLoadCallback(drawCrosshairs);
+    <script type="text/javascript">
 
-function drawCrosshairs() {
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Month');
-      data.addColumn('number', 'Staff');
-      data.addColumn('number', 'Venue');
-      data.addColumn('number', 'Jobs');
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
 
-      data.addRows([
-        {% for item in chart_data %}
-            [new Date({{ item.year }}, {{ item.month }}),  {{ item.staff }},  {{ item.venues }}, {{ item.jobs }}]{% if not forloop.last %},{% endif %}
-        {% endfor %}
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Slices');
+        data.addRows([
+          ['Active Freelancers', {{ active_freelancers }}],
+          ['In-Active Freelancers', {{ inactive_freelancers }}]
+        ]);
+
+        // Set chart options
+        var options = {'title':'Active freelancers to the total freelancers',
+                       'width':400,
+                       'height':200};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('active_freelancers_chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+
+    <script type="text/javascript">
+
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Slices');
+        data.addRows([
+          ['Working Freelancers', {{ working_freelancers }}],
+          ['Non-Working Freelancers', {{ not_working_freelancers }}]
+        ]);
+
+        // Set chart options
+        var options = {'title':'Working freelancers to the total freelancers',
+                       'width':400,
+                       'height':200};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('working_freelancers_chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+
+    <script type="text/javascript">
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+        ["Element", "Density", { role: "style" }, { role: 'annotation' } ],
+        ["Jobs", {{ total_jobs }}, "blue", ''],
+        ["Interviews", {{ interviews_jobs }}, "orange", '{{ interviews_jobs_percent }}%'],
+        ["Hires", {{ hired_jobs }}, "gold", '{{ hired_jobs_percent }}%'],
+        ["Completed", {{ completed_jobs }}, "green", '{{ completed_jobs_percent }}%'],
+        ["Dispute", {{ disputed_jobs }}, "red", '{{ disputed_jobs_percent }}%']
       ]);
 
+      var view = new google.visualization.DataView(data);
+
       var options = {
-        hAxis: {
-          title: 'Month'
-        },
-        vAxis: {
-          title: 'Count'
-        },
-          title: 'Number of Staff, Venues and Jobs in the site',
-          width: 900,
-        height: 500
+        title: "Total jobs stats",
+        width: 600,
+        height: 400,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
       };
-
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
-
-      var formatter = new google.visualization.DateFormat({pattern: 'MMM y'});
-      formatter.format(data, 0);
-      chart.draw(data, options);
-{#      chart.setSelection([{row: 38, column: 1}]);#}
-
-    }
+      var chart = new google.visualization.ColumnChart(document.getElementById("jobs_chart_div"));
+      chart.draw(view, options);
+  }
     </script>
+
 {% endblock %}
